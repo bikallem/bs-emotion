@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "ocaml": "~4.6.1000",
-    "@opam/dune": "*",
+    "@opam/dune": "2.0.1",
     "@opam/reason": "*",
     "@opam/ocaml-migrate-parsetree": "*"
   },
