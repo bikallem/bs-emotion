@@ -1,16 +1,6 @@
 name: build, test and publish bs-emotion/bs-emotion-ppx
 
-on:  
-  push:    
-    branches: 
-      - master
-        
-  release:
-    types: [published]
-    
-  pull_request:
-    branches:
-      - master    
+on: [push, pull_request]   
 
 jobs:
   build_and_test:
