@@ -13,8 +13,8 @@ on:
       - master    
 
 jobs:
-  test_and_build:
-    name: Test and build ${{ matrix.os }}
+  build_and_test:
+    name: build and test ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -59,51 +59,26 @@ jobs:
           restore-keys: |
             v1-esy-${{ matrix.os }}-
       
-      - name: esy install and build
+      - name: install and build
         working-directory: bs-emotion-ppx
         run: |                    
           esy install 
-          esy build          
+          esy dune build --root . --only-packages '#{self.name}' --ignore-promoted-rules --no-config --profile release-static
           
       - name: bs-emotion-ppx test
         working-directory: bs-emotion-ppx/test
         run: |                    
           esy install
-          esy build               
-                           
-      - name: Retrieve bs-emotion-ppx binary path
-        id: bs-emotion-ppx-path
-        working-directory: bs-emotion-ppx
-        shell: bash
-        run: |                    
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
-            BS_EMOTION_PPX_PATH=$( echo "$(esy x which bs-emotion-ppx)") 
-            BS_EMOTION_PPX_PATH=$( cygpath --mixed --absolute "$BS_EMOTION_PPX_PATH")           
-          else
-            BS_EMOTION_PPX_PATH=$(echo "$(esy x which bs-emotion-ppx)")
-          fi
-          mkdir upload 
-          cp $BS_EMOTION_PPX_PATH upload/
-          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            mv package.json upload/package.json
-            mv README.md upload/README.md
-            mv postinstall.js upload/postinstall.js
-          fi
-          UPLOAD_PATH=$( echo "$(pwd)/upload")
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
-            UPLOAD_PATH=$( cygpath --mixed --absolute "$UPLOAD_PATH")
-          fi          
-          echo "UPLOAD_PATH: $UPLOAD_PATH"          
-          echo "##[set-output name=path;]$UPLOAD_PATH"          
+          esy build
       
       - name: Upload artifacts ${{ matrix.os }}        
         uses: actions/upload-artifact@master
         with:
           name: ${{ matrix.os }}
-          path: ${{ steps.bs-emotion-ppx-path.outputs.path }}
+          path: _build/default/bin/BsEmotionPpx.exe
 
   publish:    
-    needs: test_and_build
+    needs: build_and_test
     if: github.event_name == 'release' && success()
     name: Publish
     runs-on: ubuntu-latest
@@ -135,13 +110,13 @@ jobs:
       - name: Move artifacts
         run: |          
           mkdir -p release/bin
-          mv release/darwin/bs-emotion-ppx release/bin/bs-emotion-ppx-darwin-x64.exe
-          mv release/windows/bs-emotion-ppx.exe release/bin/bs-emotion-ppx-win-x64.exe
-          mv release/linux/bs-emotion-ppx release/bin/bs-emotion-ppx-linux-x64.exe
-          mv release/linux/package.json release/package.json
-          mv release/linux/postinstall.js release/postinstall.js
-          mv release/linux/README.md release/README.md
-          chmod +x release/bin/*.exe
+          mv release/darwin/bs-emotion-ppx release/bs-emotion-ppx-darwin-x64.exe
+          mv release/windows/bs-emotion-ppx.exe release/bs-emotion-ppx-win-x64.exe
+          mv release/linux/bs-emotion-ppx release/bs-emotion-ppx-linux-x64.exe
+          mv bs-emotion-ppx/package.json release/package.json
+          mv bs-emotion-ppx/postinstall.js release/postinstall.js
+          mv README.md release/README.md
+          chmod +x release/*.exe
           ls -l release
 
       - name: Publish bs-emotion-ppx       

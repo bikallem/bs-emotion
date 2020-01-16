@@ -9,19 +9,23 @@ var binDir = path.join(rootDir, "bin");
  * Returns OS specific binary to copy to "bin" folder.
  */
 function getBinaryDetails() {
-    switch (os.type()) {
-        case 'Darwin':
-            return { src: path.join(binDir, "bs-emotion-ppx-darwin-x64.exe"), dest: path.join(binDir, "bs-emotion-ppx.exe") };
+  if (process.arch === "ia32") {
+    throw (`${process.arch} architecture not supported.`);
+  }
 
-        case 'Linux':
-            return { src: path.join(binDir, "bs-emotion-ppx-linux-x64.exe"), dest: path.join(binDir, "bs-emotion-ppx.exe") }
+  switch (os.type()) {
+    case 'Darwin':
+      return { src: path.join(binDir, "bs-emotion-ppx-darwin-x64.exe"), dest: path.join(binDir, "bs-emotion-ppx.exe") };
 
-        case 'Windows_NT':
-            return { src: path.join(binDir, "bs-emotion-ppx-win-x64.exe"), dest: path.join(binDir, "bs-emotion-ppx.exe") }
+    case 'Linux':
+      return { src: path.join(binDir, "bs-emotion-ppx-linux-x64.exe"), dest: path.join(binDir, "bs-emotion-ppx.exe") }
 
-        default:
-            throw ("Not supported" + os.type());
-    }
+    case 'Windows_NT':
+      return { src: path.join(binDir, "bs-emotion-ppx-win-x64.exe"), dest: path.join(binDir, "bs-emotion-ppx.exe") }
+
+    default:
+      throw (`${os.type()} OS Not supported`);
+  }
 }
 
 var binaryDetails = getBinaryDetails();
