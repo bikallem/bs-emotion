@@ -11,7 +11,7 @@
     "bucklescript"
   ],
   "license": "MIT",
-  "name": "@bikallem/bs-emotion-ppx",
+  "name": "@ahrefs/bs-emotion-ppx",
   "version": "1.0.7",
   "scripts": {
     "postinstall": "node ./postinstall.js"

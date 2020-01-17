@@ -107,9 +107,9 @@ jobs:
       - name: Move artifacts
         run: |          
           mkdir -p release/bin
-          mv release/darwin/bs-emotion-ppx release/bs-emotion-ppx-darwin-x64.exe
-          mv release/windows/bs-emotion-ppx.exe release/bs-emotion-ppx-win-x64.exe
-          mv release/linux/bs-emotion-ppx release/bs-emotion-ppx-linux-x64.exe
+          mv release/darwin/BsEmotionPpx.exe release/bs-emotion-ppx-darwin-x64.exe
+          mv release/windows/BsEmotionPpx.exe release/bs-emotion-ppx-win-x64.exe
+          mv release/linux/BsEmotionPpx.exe release/bs-emotion-ppx-linux-x64.exe
           mv bs-emotion-ppx/package.json release/package.json
           mv bs-emotion-ppx/postinstall.js release/postinstall.js
           mv README.md release/README.md
@@ -118,12 +118,18 @@ jobs:
 
       - name: Publish bs-emotion-ppx       
         working-directory: release
-        run: npm publish --access public
+        run: |
+          npm config set scope "@bikallem"
+          npm config list
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
           
       - name: Publish bs-emotion
         working-directory: bs-emotion
-        run: npm publish --access public
+        run: |
+          npm config set scope "@bikallem"
+          npm config list
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
